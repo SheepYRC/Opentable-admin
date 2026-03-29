@@ -20,6 +20,9 @@ export const useSettingsStore = defineStore("settings", () => {
   const pageSwitchingAnimation = useStorage<string>("pageSwitchingAnimation", defaults.pageSwitchingAnimation);
   const watermarkContent = useStorage<string>("watermarkContent", defaults.watermarkContent);
 
+  // 界面控制
+  const settingsVisible = ref(false);
+
   // 切换主题模式
   function changeTheme(val: ThemeMode) {
     theme.value = val;
@@ -35,6 +38,22 @@ export const useSettingsStore = defineStore("settings", () => {
     layout.value = val;
   }
 
+  // 重置设置
+  function resetSettings() {
+    theme.value = defaults.theme;
+    themeColor.value = defaults.themeColor;
+    sidebarColorScheme.value = defaults.sidebarColorScheme;
+    layout.value = defaults.layout;
+    size.value = defaults.size;
+    language.value = defaults.language;
+    showTagsView.value = defaults.showTagsView;
+    showAppLogo.value = defaults.showAppLogo;
+    showWatermark.value = defaults.showWatermark;
+    showSettings.value = defaults.showSettings;
+    pageSwitchingAnimation.value = defaults.pageSwitchingAnimation;
+    watermarkContent.value = defaults.watermarkContent;
+  }
+
   return {
     theme,
     themeColor,
@@ -48,8 +67,10 @@ export const useSettingsStore = defineStore("settings", () => {
     showSettings,
     pageSwitchingAnimation,
     watermarkContent,
+    settingsVisible,
     changeTheme,
     changeThemeColor,
     changeLayout,
+    resetSettings,
   };
 });

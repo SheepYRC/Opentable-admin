@@ -1,23 +1,43 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import Layout from "@/layout/index.vue";
+
+// 静态路由
+export const constantRoutes: RouteRecordRaw[] = [
+  {
+    path: "/redirect",
+    component: Layout,
+    meta: { hidden: true },
+    children: [
+      {
+        path: "/redirect/:path(.*)",
+        component: () => import("@/views/redirect/index.vue"),
+      },
+    ],
+  },
+  {
+    path: "/login",
+    component: () => import("@/views/login/index.vue"),
+    meta: { hidden: true },
+  },
+  {
+    path: "/",
+    component: Layout,
+    redirect: "/dashboard",
+    children: [
+      {
+        path: "dashboard",
+        component: () => import("@/views/dashboard/index.vue"),
+        name: "Dashboard",
+        meta: { title: "首页", icon: "HomeFilled", affix: true },
+      },
+    ],
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-  ],
-})
+  routes: constantRoutes,
+  scrollBehavior: () => ({ left: 0, top: 0 }),
+});
 
-export default router
+export default router;
