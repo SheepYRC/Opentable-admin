@@ -1,19 +1,32 @@
 <template>
   <div class="logo">
-    <transition enter-active-class="animate__animated animate__fadeInLeft">
-      <router-link :key="+collapse" class="wh-full flex-center" to="/">
-<!--        <img :src="logo" class="w20px h20px" />-->
-        <span v-if="!collapse" class="title">
-          {{ appConfig.title }}
-        </span>
-      </router-link>
-    </transition>
+    <div v-if="!collapse" class="logo-buttons">
+      <el-button-group>
+        <el-button 
+          :type="activeTab === 'admin' ? 'primary' : ''" 
+          size="small" 
+          @click="activeTab = 'admin'"
+        >管理</el-button>
+        <el-button 
+          :type="activeTab === 'data' ? 'primary' : ''" 
+          size="small" 
+          @click="activeTab = 'data'"
+        >数据</el-button>
+        <el-button 
+          :type="activeTab === 'ai' ? 'primary' : ''" 
+          size="small" 
+          @click="activeTab = 'ai'"
+        >智能</el-button>
+      </el-button-group>
+    </div>
+    <div v-else class="logo-collapsed">
+      <el-icon :size="24"><Platform /></el-icon>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { appConfig } from "@/settings";
-import logo from "@/assets/logo.svg";
+import { Platform } from "@element-plus/icons-vue";
 
 defineProps({
   collapse: {
@@ -21,6 +34,8 @@ defineProps({
     required: true,
   },
 });
+
+const activeTab = ref("admin");
 </script>
 
 <style lang="scss" scoped>
@@ -31,21 +46,19 @@ defineProps({
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
 
-  .wh-full {
+  .logo-buttons {
     width: 100%;
-    height: 100%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    text-decoration: none;
+
+    :deep(.el-button) {
+      padding: 5px 8px;
+    }
   }
 
-  .title {
-    flex-shrink: 0;
-    margin-left: 10px;
-    font-size: 14px;
-    font-weight: bold;
+  .logo-collapsed {
     color: #fff;
   }
 }

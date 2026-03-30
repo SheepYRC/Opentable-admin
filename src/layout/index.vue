@@ -2,6 +2,7 @@
   <div class="layout-wrapper" :class="layoutClass">
     <LeftLayout />
     <Settings v-if="showSettings" />
+    <LayoutAIPanel />
   </div>
 </template>
 

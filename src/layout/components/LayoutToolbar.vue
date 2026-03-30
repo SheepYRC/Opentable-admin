@@ -10,7 +10,7 @@
       <el-dropdown trigger="click">
         <div class="user-profile">
           <el-avatar :size="24" :src="userStore.avatar || defaultAvatar" />
-          <span class="user-profile__name">{{ userStore.nickname || '管理员' }}</span>
+          <span class="user-profile__name">{{ userStore.nickname || "管理员" }}</span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
@@ -21,25 +21,27 @@
       </el-dropdown>
     </div>
 
-    <!-- 系统设置 -->
-    <div class="navbar-actions__item" @click="handleSettingsClick">
-      <el-icon :size="18"><Setting /></el-icon>
+
+    <!-- 全局AI面板 -->
+    <div class="navbar-actions__item" @click="handleAIClick">
+      <el-icon :size="18"><Reading /></el-icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { FullScreen, Setting } from "@element-plus/icons-vue";
-import { useAppStore, useSettingsStore, useUserStore } from "@/stores";
+import { FullScreen, Setting, Reading } from "@element-plus/icons-vue";
+import { useAppStore, useSettingsStore, useUserStore, useAIPanelStore } from "@/stores";
 import { useFullscreen } from "@vueuse/core";
 import { ElMessageBox } from "element-plus";
+import logo from "@/assets/logo.svg";
 
 const userStore = useUserStore();
 const settingsStore = useSettingsStore();
 const router = useRouter();
 const { toggle: toggleFullscreen } = useFullscreen();
 
-const defaultAvatar = "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png";
+const defaultAvatar = logo
 
 function handleProfileClick() {
   router.push("/profile");
@@ -55,9 +57,13 @@ function handleLogout() {
   });
 }
 
-function handleSettingsClick() {
-  settingsStore.settingsVisible = true;
+const AIPanelStore = useAIPanelStore();
+
+
+function handleAIClick() {
+  AIPanelStore.AIPanelVisible = true;
 }
+
 </script>
 
 <style lang="scss" scoped>

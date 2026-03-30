@@ -10,7 +10,7 @@ import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    //vueDevTools(),
     AutoImport({
       imports: ["vue", "@vueuse/core", "pinia", "vue-router", "vue-i18n"],
       resolvers: [ElementPlusResolver()],

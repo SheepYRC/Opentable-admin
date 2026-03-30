@@ -1,8 +1,6 @@
-# Vue3 + Element Plus 管理后台搭建指南 (老师傅版)
+# Vue3 + Element Plus 管理后台搭建指南
 
 你好！既然要把这个 Vue3 自带模板改造成像 `vue3-element-admin` 那样的专业后台，我们需要从底层架构就开始考究。这不仅仅是把组件堆起来，而是要建立一套**可维护、可扩展、标准化的工程体系**。
-
-作为一名“老师傅”，我为你规划了这份阶梯式的搭建清单，帮助你稳步构建出属于自己的管理系统“架子”。
 
 ---
 
@@ -10,46 +8,48 @@
 在写任何业务代码之前，先把规矩定好。
 
 1. **包管理工具**: 推荐使用 `pnpm`，比 `npm` 和 `yarn` 更快、更节省磁盘空间。
-    > —— **师傅记录**: 已验证根目录下存在 `pnpm-lock.yaml`，确认项目使用 `pnpm` 进行依赖管理。
+    > —— **记录**: 已验证根目录下存在 `pnpm-lock.yaml`，确认项目使用 `pnpm` 进行依赖管理。
 2. **UI 框架集成 (Element Plus)**:
     - 引入 `element-plus`。
-    > —— **师傅记录**: `element-plus` 已安装至 `dependencies`。
+    > —— **记录**: `element-plus` 已安装至 `dependencies`。
     - 使用 `unplugin-vue-components` 和 `unplugin-auto-import` 实现按需自动引入。
-    > —— **师傅记录**: 已在 `vite.config.ts` 中配置 `AutoImport` 和 `Components` 插件，并集成 `ElementPlusResolver`。生成的类型声明文件位于 `src/types/`。
+    > —— **记录**: 已在 `vite.config.ts` 中配置 `AutoImport` 和 `Components` 插件，并集成 `ElementPlusResolver`。生成的类型声明文件位于 `src/types/`。
 3. **CSS 预处理器 (Sass/SCSS)**:
     - 后台管理系统通常有大量的样式变量，必须使用 Sass/SCSS 进行工程化管理。
-    > —— **师傅记录**: `sass` 已安装至 `devDependencies`。
+    > —— **记录**: `sass` 已安装至 `devDependencies`。
 4. **代码规范封装**:
     - 配置 `.editorconfig`, `ESLint`, `Prettier`。
-    > —— **师傅记录**: `.editorconfig`, `eslint.config.ts` (ESLint 9+ Flat Config) 和 `.prettierrc.yaml` 已配置完成。
+    > —— **记录**: `.editorconfig`, `eslint.config.ts` (ESLint 9+ Flat Config) 和 `.prettierrc.yaml` 已配置完成。
     - 进阶：配置 `husky` 和 `lint-staged`。
-    > —— **师傅记录**: `.husky` 钩子已初始化，`package.json` 中的 `lint-staged` 已配置，确保提交代码符合规范。
+    > —— **记录**: `.husky` 钩子已初始化，`package.json` 中的 `lint-staged` 已配置，确保提交代码符合规范。
 
 ## 🏛️ 第二阶段：核心架构设计 (Infrastructure)
 这是后台管理系统的“脊梁骨”。
 
 1. **状态管理 (Pinia)**:
     - 替代 Vuex。划分模块：`user`, `app`, `settings`。
-    > —— **师傅记录**: `src/stores` 下已建立 `user.ts` (用户信息/Token)、`app.ts` (侧边栏/设备) 和 `settings.ts` (主题模式/布局) 模块。
+    > —— **记录**: `src/stores` 下已建立 `user.ts` (用户信息/Token)、`app.ts` (侧边栏/设备) 和 `settings.ts` (主题模式/布局) 模块。
 2. **网络请求封装 (Axios)**:
     - 在 `src/utils/request.ts` 中封装 Axios 实例。
     - 设置请求/响应拦截器。
-    > —— **师傅记录**: `axios` 已安装。`request.ts` 已实现 Token 自动携带、401 自动跳转登录、业务状态码统一处理等核心功能。
+    > —— **记录**: `axios` 已安装。`request.ts` 已实现 Token 自动携带、401 自动跳转登录、业务状态码统一处理等核心功能。
 3. **全域环境变量**:
     - 划分 `.env.development` 和 `.env.production`。
-    > —— **师傅记录**: 已配置 `VITE_APP_BASE_API` 及 Mock 开关。注意：Vite 环境变量必须以 `VITE_` 开头才能在客户端访问。
+    > —— **记录**: 已配置 `VITE_APP_BASE_API` 及 Mock 开关。注意：Vite 环境变量必须以 `VITE_` 开头才能在客户端访问。
 
 ## 🎨 第三阶段：布局系统 (Layout System)
 管理后台的灵魂在于侧边栏和顶栏的交互。
 
 1. **模块化布局**:
     - 将页面拆分为：`Layout`, `Sidebar` (侧边栏), `Navbar` (顶栏), `AppMain` (主内容区), `TagsView` (标签页栏)。
+    > —— **记录**: 已配置
 2. **动态侧边栏**:
     - 基于 Vue Router 的 `routes` 列表自动滚动生成菜单。
     - 支持无限级嵌套菜单。
 3. **面包屑与标签页**:
     - 实现全路径的面包屑导航（Breadcrumb）。
     - 实现多标签页（TagsView）管理，支持右键关闭、刷新等操作。
+    > —— **记录**: 已注释，暂时不使用
 
 ## 🔐 第四阶段：权限与动态路由 (RBAC Control)
 这是专业后台与普通项目最大的区别。
@@ -92,23 +92,3 @@ src/
 
 ---
 
-### 第一步建议：
-既然你已经有了 Vue3 项目，你的**第一步**应该是：
-1. 安装 `element-plus`, `sass`。
-2. 配置 Vite 插件实现 Element Plus 的自动引入。
-3. 建立 `src/layout` 目录，开始画出那个三段式（侧边、顶部、主体）的界面雏形。
-
-### 第三阶段：布局系统集成 (Stage 3) - 已完成 ✅
-
-- [x] **3.1 引入布局组件**：成功引入并精简了参考项目的布局系统。
-  - **师傅记录**：
-    - **逻辑整合**：重构了 `useLayout.ts` 逻辑，实现了设备自动检测（移动端/桌面端适配）和侧边栏状态管理。
-    - **结构简化**：舍弃了动态切换逻辑，直接采用 `LeftLayout.vue` 作为核心布局。
-    - **依赖修复**：手动补全了缺失的 `Hamburger`、`Breadcrumb`、`AppLink` 等基础组件，并解决了 `path-browserify` 和 `path-to-regexp` 的依赖问题。
-    - **样式标准化**：通过 `variables.module.scss` 统一管理侧边栏宽度、高度及配色方案。
-- [x] **3.2 侧边栏与面包屑逻辑**：完成菜单递归渲染及面包屑自动生成逻辑。
-- [x] **3.3 状态管理与 Store 集成**：
-  - **师傅记录**：完善了 `app`、`settings`、`permission` 和 `tagsView` store。实现了标签页缓存、多页签管理（右键刷新、关闭等）功能。
-- [x] **3.4 类型与全局导出**：建立了 `src/stores/index.ts` 统一出口，支持 `@/stores` 别名引入。
-
-**接下来，我们将进入第四阶段：权限与动态路由 (RBAC Control)，开始处理真正的权限菜单生成逻辑。**
