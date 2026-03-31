@@ -6,19 +6,16 @@
         (hasOneShowingChild(item.children, item) &&
           (!onlyOneChild.children || onlyOneChild.noShowingChildren) &&
           !item.meta?.alwaysShow) ||
-          (item.meta?.alwaysShow && (!item.children || item.children.length === 0))
+        (item.meta?.alwaysShow && (!item.children || item.children.length === 0))
       "
     >
-      <AppLink
-        v-if="onlyOneChild && onlyOneChild.meta"
-        :to="resolvePath(onlyOneChild.path)"
-      >
+      <AppLink v-if="onlyOneChild && onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item
           :index="resolvePath(onlyOneChild.path)"
           :class="{ 'submenu-title-noDropdown': !isNest }"
         >
           <el-icon v-if="onlyOneChild.meta.icon || item.meta?.icon">
-             <component :is="onlyOneChild.meta.icon || item.meta?.icon" />
+            <component :is="onlyOneChild.meta.icon || item.meta?.icon" />
           </el-icon>
           <template #title>
             <span v-if="onlyOneChild.meta.title">

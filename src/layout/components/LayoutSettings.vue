@@ -125,7 +125,13 @@
 
 <script setup lang="ts">
 import { DocumentCopy, RefreshLeft, Check } from "@element-plus/icons-vue";
-import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode, type OptionItem } from "@/enums";
+import {
+  LayoutMode,
+  PageSwitchingAnimationOptions,
+  SidebarColor,
+  ThemeMode,
+  type OptionItem,
+} from "@/enums";
 import { useSettingsStore } from "@/stores";
 import { ElMessage } from "element-plus";
 
@@ -150,14 +156,7 @@ const layoutOptions = [
   { value: LayoutMode.MIX, label: "混合菜单模式", className: "mix" },
 ];
 
-const colorPresets = [
-  "#409EFF",
-  "#009688",
-  "#11a983",
-  "#13c2c2",
-  "#6954f0",
-  "#f5222d",
-];
+const colorPresets = ["#409EFF", "#009688", "#11a983", "#13c2c2", "#6954f0", "#f5222d"];
 
 const settingsStore = useSettingsStore();
 
@@ -301,9 +300,15 @@ const handleCloseDrawer = () => {
     }
   }
 
-  &.top .layout-sidebar { display: none; }
-  &.left .layout-header { display: none; }
-  &.left .layout-main { top: 2px; }
+  &.top .layout-sidebar {
+    display: none;
+  }
+  &.left .layout-header {
+    display: none;
+  }
+  &.left .layout-main {
+    top: 2px;
+  }
 
   .layout-name {
     font-size: 10px;

@@ -3,39 +3,30 @@
     <el-card shadow="never" class="welcome-card">
       <div class="flex-y-center">
         <el-avatar :size="64" :src="userStore.avatar || defaultAvatar" />
-        <div class="ml-4">
-          <h2 class="text-xl font-bold">早安, {{ userStore.nickname || '管理员' }}!</h2>
-          <p class="text-gray-500 mt-1">今天又是充满活力的一天，准备好开始工作了吗？</p>
-        </div>
+		  <div class="ml-2 text-xl font-bold">管理员</div>
       </div>
     </el-card>
 
-    <el-row :gutter="20" class="mt-4">
-      <el-col :span="6" v-for="i in 4" :key="i">
-        <el-card shadow="hover">
-          <template #header>数据指标 {{ i }}</template>
-          <div class="text-2xl font-bold text-primary">{{ i * 1234 }}</div>
-          <p class="text-xs text-green-500 mt-2">+ {{ i * 2 }}% 较昨日增长</p>
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useUserStore } from "@/stores";
+import logo from "@/assets/logo.svg";
 
 const userStore = useUserStore();
-const defaultAvatar = "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png";
+const defaultAvatar = logo;
 </script>
 
 <style lang="scss" scoped>
 .dashboard-container {
   padding: 20px;
+	height:100%;
 }
 
 .welcome-card {
   border: none;
+	height: 100%;
   background: linear-gradient(to right, #fdfbfb 0%, #ebedee 100%);
 }
 

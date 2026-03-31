@@ -6,8 +6,8 @@
  * console.log(styles['sidebar-width']) // "210px"
  */
 
-@forward "./variables";
-@use "./variables" as *;
+@forward "variables";
+@use "variables" as *;
 
 
 :export {

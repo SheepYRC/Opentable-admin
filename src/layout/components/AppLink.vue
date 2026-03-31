@@ -34,7 +34,7 @@ const linkProps = (to: any) => {
     };
   }
   return {
-    to: to,
+    to,
   };
 };
 </script>

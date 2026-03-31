@@ -55,7 +55,9 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   function delCachedView(view: any) {
     const viewName = view.name as string;
     const index = cachedViews.value.indexOf(viewName);
-    index > -1 && cachedViews.value.splice(index, 1);
+    if (index > -1) {
+      cachedViews.value.splice(index, 1);
+    }
   }
 
   function delOtherViews(view: any) {

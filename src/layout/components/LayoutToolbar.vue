@@ -21,7 +21,6 @@
       </el-dropdown>
     </div>
 
-
     <!-- 全局AI面板 -->
     <div class="navbar-actions__item" @click="handleAIClick">
       <el-icon :size="18"><Reading /></el-icon>
@@ -30,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { FullScreen, Setting, Reading } from "@element-plus/icons-vue";
-import { useAppStore, useSettingsStore, useUserStore, useAIPanelStore } from "@/stores";
+import { FullScreen, Reading } from "@element-plus/icons-vue";
+import { useSettingsStore, useUserStore, useAIPanelStore } from "@/stores";
 import { useFullscreen } from "@vueuse/core";
 import { ElMessageBox } from "element-plus";
 import logo from "@/assets/logo.svg";
@@ -41,7 +40,7 @@ const settingsStore = useSettingsStore();
 const router = useRouter();
 const { toggle: toggleFullscreen } = useFullscreen();
 
-const defaultAvatar = logo
+const defaultAvatar = logo;
 
 function handleProfileClick() {
   router.push("/profile");
@@ -59,11 +58,9 @@ function handleLogout() {
 
 const AIPanelStore = useAIPanelStore();
 
-
 function handleAIClick() {
   AIPanelStore.AIPanelVisible = true;
 }
-
 </script>
 
 <style lang="scss" scoped>

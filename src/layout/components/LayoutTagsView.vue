@@ -24,7 +24,7 @@
           "
           @contextmenu.prevent="(event: MouseEvent) => openContextMenu(tag, event)"
         >
-          {{ translateRouteTitle(tag.meta?.title as string || 'no-name') }}
+          {{ translateRouteTitle((tag.meta?.title as string) || "no-name") }}
         </el-tag>
       </div>
     </el-scrollbar>
@@ -131,7 +131,7 @@ const extractAffixTags = (routes: readonly RouteRecordRaw[], basePath = "/"): an
           path: fullPath,
           fullPath,
           name: String(route.name || ""),
-          meta: { ...route.meta }
+          meta: { ...route.meta },
         });
       }
 
@@ -183,7 +183,7 @@ const closeSelectedTag = (tag: any) => {
   if (!tag) return;
   tagsViewStore.delView(tag).then((res: any) => {
     if (tagsViewStore.isActive(tag)) {
-        tagsViewStore.toLastView(res.visitedViews, tag);
+      tagsViewStore.toLastView(res.visitedViews, tag);
     }
   });
 };
@@ -196,7 +196,7 @@ const closeLeftTags = () => {
   tagsViewStore.delLeftViews(selectedTag.value).then((res: any) => {
     const hasCurrentRoute = res.visitedViews.some((v: any) => v.path === route.path);
     if (!hasCurrentRoute) {
-        tagsViewStore.toLastView(res.visitedViews);
+      tagsViewStore.toLastView(res.visitedViews);
     }
   });
 };
@@ -209,7 +209,7 @@ const closeRightTags = () => {
   tagsViewStore.delRightViews(selectedTag.value).then((res: any) => {
     const hasCurrentRoute = res.visitedViews.some((v: any) => v.path === route.path);
     if (!hasCurrentRoute) {
-        tagsViewStore.toLastView(res.visitedViews);
+      tagsViewStore.toLastView(res.visitedViews);
     }
   });
 };
@@ -259,18 +259,25 @@ const handleScroll = (event: WheelEvent) => {
 };
 
 // 监听菜单显示隐藏
-watch(() => contextMenu.visible, (value) => {
-  if (value) {
-    document.addEventListener("click", closeContextMenu);
-  } else {
-    document.removeEventListener("click", closeContextMenu);
+watch(
+  () => contextMenu.visible,
+  (value) => {
+    if (value) {
+      document.addEventListener("click", closeContextMenu);
+    } else {
+      document.removeEventListener("click", closeContextMenu);
+    }
   }
-});
+);
 
 // 监听路由
-watch(route, () => {
-  addCurrentTag();
-}, { immediate: true });
+watch(
+  route,
+  () => {
+    addCurrentTag();
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   initAffixTags();
@@ -285,7 +292,9 @@ onMounted(() => {
   height: vars.$tags-view-height;
   background-color: var(--el-bg-color);
   border-bottom: 1px solid var(--el-border-color-light);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.12),
+    0 0 3px 0 rgba(0, 0, 0, 0.04);
 
   .scroll-container {
     white-space: nowrap;
@@ -294,7 +303,7 @@ onMounted(() => {
     width: 100%;
 
     :deep(.el-scrollbar__bar) {
-      bottom: 2px;
+      display: none !important; // 核心：彻底关闭滚轮条显示，tag栏通常需要流畅度，而不展示滚动条
     }
 
     .tags-wrapper {

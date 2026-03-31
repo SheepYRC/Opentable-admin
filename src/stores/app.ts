@@ -32,5 +32,13 @@ export const useAppStore = defineStore("app", () => {
   /** 当前激活的顶部菜单路径 (用于混合布局) */
   const activeTopMenuPath = ref("");
 
-  return { sidebar, device, activeTopMenuPath, toggleSidebar, closeSideBar, openSideBar, toggleDevice };
+  return {
+    sidebar,
+    device,
+    activeTopMenuPath,
+    toggleSidebar,
+    closeSideBar,
+    openSideBar,
+    toggleDevice,
+  };
 });
