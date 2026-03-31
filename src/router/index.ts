@@ -30,6 +30,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "Dashboard",
         meta: { title: "首页", icon: "HomeFilled", affix: true },
       },
+      {
+        path: "data-viewer",
+        component: () => import("@/views/viewer/index.vue"),
+        name: "DataViewer",
+        meta: { title: "数据视图", icon: "DataAnalysis" },
+      },
     ],
   },
 ];

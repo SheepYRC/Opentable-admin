@@ -33,6 +33,7 @@
 
 <script lang="ts" setup>
 import { Platform } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 
 defineProps({
   collapse: {
@@ -41,7 +42,21 @@ defineProps({
   },
 });
 
-const activeTab = ref("admin");
+const router = useRouter();
+const route = useRoute();
+
+const activeTab = computed<"admin" | "data" | "ai">({
+  get: () => {
+    if (route.path.includes("/data-viewer")) return "data";
+    if (route.path.includes("/dashboard") || route.path === "/") return "admin";
+    return "admin";
+  },
+  set: (val) => {
+    if (val === "admin") router.push("/dashboard");
+    if (val === "data") router.push("/data-viewer");
+    if (val === "ai") ElMessage.info("智能模式开发中...");
+  },
+});
 </script>
 
 <style lang="scss" scoped>

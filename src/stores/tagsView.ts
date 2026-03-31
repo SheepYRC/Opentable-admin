@@ -3,8 +3,26 @@ import type { RouteLocationNormalized } from "vue-router";
 import router from "@/router";
 
 export const useTagsViewStore = defineStore("tagsView", () => {
-  const visitedViews = ref<RouteLocationNormalized[]>([]);
+  // 从 localStorage 加载持久化的视图 (除了 affix 类型的)
+  const savedViews = localStorage.getItem("visitedViews");
+  const initialViews = savedViews ? JSON.parse(savedViews) : [];
+  
+  const visitedViews = ref<RouteLocationNormalized[]>(initialViews);
   const cachedViews = ref<string[]>([]);
+
+  // 监听变化并同步到 localStorage (过滤掉无法序列化的部分)
+  watch(visitedViews, (val) => {
+    const persistViews = val.map((v: any) => ({
+      path: v.path,
+      fullPath: v.fullPath,
+      name: v.name,
+      meta: v.meta,
+      title: v.title,
+      query: v.query,
+      params: v.params
+    }));
+    localStorage.setItem("visitedViews", JSON.stringify(persistViews));
+  }, { deep: true });
 
   function isActive(view: RouteLocationNormalized) {
     return view.path === router.currentRoute.value.path;
@@ -17,11 +35,18 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function addVisitedView(view: any) {
     if (visitedViews.value.some((v) => v.path === view.path)) return;
-    visitedViews.value.push(
-      Object.assign({}, view, {
-        title: view.title || "no-name",
-      })
-    );
+
+    const newView = {
+      ...view,
+      title: (view.meta?.title as string) || (view.name as string) || "no-name",
+    };
+
+    // 如果是固定标签，且列表不为空，则尝试放到合适的位置（固定标签在前）
+    if (newView.meta?.affix) {
+      visitedViews.value.unshift(newView as any);
+    } else {
+      visitedViews.value.push(newView as any);
+    }
   }
 
   function addCachedView(view: any) {

@@ -276,11 +276,12 @@ watch(
   () => {
     addCurrentTag();
   },
-  { immediate: true }
+  { immediate: false }
 );
 
 onMounted(() => {
   initAffixTags();
+  addCurrentTag();
 });
 </script>
 

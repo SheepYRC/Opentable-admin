@@ -20,15 +20,18 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@vueuse/core": "^14.2.1",
     "ag-grid-community": "^35.2.0",
+    "ag-grid-vue3": "^35.2.0",
     "axios": "^1.14.0",
     "element-plus": "^2.13.6",
+    "jschardet": "^3.1.4",
     "nprogress": "^0.2.0",
     "page-agent": "^1.6.3",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "^8.4.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.30",
-    "vue-router": "^5.0.3"
+    "vue-router": "^5.0.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

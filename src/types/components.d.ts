@@ -42,6 +42,7 @@ declare module 'vue' {
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     Hamburger: typeof import('./../components/Hamburger/index.vue')['default']
     LayoutAIPanel: typeof import('./../layout/components/LayoutAIPanel.vue')['default']
     LayoutLogo: typeof import('./../layout/components/LayoutLogo.vue')['default']
