@@ -4,6 +4,7 @@ import { useUserStore } from "./user";
 import { usePermissionStore } from "./permission";
 import { useTagsViewStore } from "./tagsView";
 import { useAIPanelStore } from "./aiPanel";
+import { useViewStore } from "./view";
 
 export {
   useAppStore,
@@ -12,4 +13,5 @@ export {
   usePermissionStore,
   useTagsViewStore,
   useAIPanelStore,
+  useViewStore,
 };

@@ -16,7 +16,7 @@
   >
     <!-- 菜单项 -->
     <LayoutSidebarItem
-      v-for="route in data"
+      v-for="route in filteredData"
       :key="route.path"
       :item="route"
       :base-path="resolveFullPath(route.path)"
@@ -26,11 +26,12 @@
 
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
+import { computed, nextTick, onMounted, watch } from "vue";
 import path from "path-browserify";
 import type { MenuInstance } from "element-plus";
 import type { RouteRecordRaw } from "vue-router";
 import { SidebarColor } from "@/enums";
-import { useSettingsStore, useAppStore } from "@/stores";
+import { useSettingsStore, useAppStore, useViewStore } from "@/stores";
 import { isExternal } from "@/utils/index";
 import LayoutSidebarItem from "./LayoutSidebarItem.vue";
 import variables from "@/styles/variables.module.scss";
@@ -55,7 +56,28 @@ const props = defineProps({
 const menuRef = ref<MenuInstance>();
 const settingsStore = useSettingsStore();
 const appStore = useAppStore();
+const viewStore = useViewStore();
 const currentRoute = useRoute();
+
+// 根据视图过滤菜单数据
+const filteredData = computed(() => {
+  const filterRoutes = (routes: any[]) => {
+    return routes.filter((item) => {
+      // 如果有 meta.view，则必须匹配
+      if (item.meta && item.meta.view && item.meta.view !== viewStore.activeView) {
+        return false;
+      }
+      // 递归处理子节点
+      if (item.children) {
+        item.children = filterRoutes(item.children);
+      }
+      return true;
+    });
+  };
+  // 深拷贝数据以防修改原始 router 配置
+  const dataCopy = JSON.parse(JSON.stringify(props.data));
+  return filterRoutes(dataCopy);
+});
 
 // 存储已展开的菜单项索引
 const expandedMenuIndexes = ref<string[]>([]);

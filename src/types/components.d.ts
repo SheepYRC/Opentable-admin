@@ -35,6 +35,7 @@ declare module 'vue' {
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
+    ElProgress: typeof import('element-plus/es')['ElProgress']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
@@ -43,11 +44,13 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    FunctionalBar: typeof import('./../layout/components/FunctionalBar.vue')['default']
     Hamburger: typeof import('./../components/Hamburger/index.vue')['default']
     LayoutAIPanel: typeof import('./../layout/components/LayoutAIPanel.vue')['default']
     LayoutLogo: typeof import('./../layout/components/LayoutLogo.vue')['default']
     LayoutMain: typeof import('./../layout/components/LayoutMain.vue')['default']
     LayoutNavbar: typeof import('./../layout/components/LayoutNavbar.vue')['default']
+    LayoutSearch: typeof import('./../layout/components/LayoutSearch.vue')['default']
     LayoutSettings: typeof import('./../layout/components/LayoutSettings.vue')['default']
     LayoutSidebar: typeof import('./../layout/components/LayoutSidebar.vue')['default']
     LayoutSidebarItem: typeof import('./../layout/components/LayoutSidebarItem.vue')['default']
@@ -55,5 +58,6 @@ declare module 'vue' {
     LayoutToolbar: typeof import('./../layout/components/LayoutToolbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SidebarBottom: typeof import('./../layout/components/SidebarBottom.vue')['default']
   }
 }

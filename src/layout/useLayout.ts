@@ -3,6 +3,8 @@
  *
  * 整合布局状态、设备检测、菜单数据
  */
+import { computed, watchEffect } from "vue";
+import { useRoute } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
 import { useAppStore, usePermissionStore, useSettingsStore } from "@/stores";
 import { DeviceEnum } from "@/enums";

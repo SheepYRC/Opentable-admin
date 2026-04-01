@@ -28,15 +28,32 @@ export const constantRoutes: RouteRecordRaw[] = [
         path: "dashboard",
         component: () => import("@/views/dashboard/index.vue"),
         name: "Dashboard",
-        meta: { title: "首页", icon: "HomeFilled", affix: true },
+        meta: { title: "管理面板", icon: "HomeFilled", affix: true, view: "management" },
+      },
+      {
+        path: "data-view",
+        component: () => import("@/views/data/index.vue"),
+        name: "DataView",
+        meta: { title: "资产管理", icon: "DataAnalysis", view: "data" },
       },
       {
         path: "data-viewer",
-        component: () => import("@/views/viewer/index.vue"),
-        name: "DataViewer",
-        meta: { title: "数据视图", icon: "DataAnalysis" },
+        redirect: "data-view",
+        meta: { hidden: true },
+      },
+      {
+        path: "ai-chat",
+        component: () => import("@/views/dashboard/index.vue"), // 临时占位
+        name: "AIChat",
+        meta: { title: "智能助手", icon: "ChatDotRound", view: "ai" },
       },
     ],
+  },
+  // 捕获所有 404
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/dashboard",
+    meta: { hidden: true },
   },
 ];
 

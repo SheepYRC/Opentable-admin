@@ -2,11 +2,12 @@
   <BaseLayout>
     <!-- 左侧菜单 -->
     <div class="layout__sidebar" :class="{ 'layout__sidebar--collapsed': !isSidebarOpen }">
-      <div :class="{ 'has-logo': showLogo }" class="layout-sidebar">
+      <div :class="{ 'has-logo': showLogo }" class="sidebar-container">
         <LayoutLogo v-if="showLogo" :collapse="!isSidebarOpen" />
-        <el-scrollbar>
+        <el-scrollbar class="sidebar-menu">
           <LayoutSidebar :data="routes" base-path="" />
         </el-scrollbar>
+        <SidebarBottom :collapse="!isSidebarOpen" />
       </div>
     </div>
 
@@ -21,6 +22,7 @@
       <div class="fixed-header">
         <LayoutNavbar />
         <LayoutTagsView v-if="showTagsView" />
+        <FunctionalBar />
       </div>
       <LayoutMain />
     </div>
@@ -35,6 +37,8 @@ import LayoutNavbar from "./components/LayoutNavbar.vue";
 import LayoutTagsView from "./components/LayoutTagsView.vue";
 import LayoutMain from "./components/LayoutMain.vue";
 import LayoutSidebar from "./components/LayoutSidebar.vue";
+import SidebarBottom from "./components/SidebarBottom.vue";
+import FunctionalBar from "./components/FunctionalBar.vue";
 
 const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
 </script>
@@ -55,20 +59,19 @@ const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
       width: $sidebar-width-collapsed;
     }
 
-    .layout-sidebar {
-      position: relative;
+    .sidebar-container {
+      display: flex;
+      flex-direction: column;
       height: 100%;
       background-color: $menu-background;
-      transition: width 0.28s;
 
-      &.has-logo {
-        .el-scrollbar {
-          height: calc(100vh - $navbar-height);
+      .sidebar-menu {
+        flex: 1;
+        overflow: hidden;
+
+        :deep(.el-menu) {
+          border: none;
         }
-      }
-
-      :deep(.el-menu) {
-        border: none;
       }
     }
   }
@@ -78,6 +81,7 @@ const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
     min-height: 100%;
     margin-left: $sidebar-width;
     transition: margin-left 0.28s;
+    background-color: var(--el-bg-color-page);
 
     &--collapsed {
       margin-left: $sidebar-width-collapsed;
@@ -89,6 +93,7 @@ const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
       z-index: 9;
       width: 100%;
       transition: width 0.28s;
+      background: var(--el-bg-color);
     }
   }
 }

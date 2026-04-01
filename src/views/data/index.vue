@@ -1,44 +1,57 @@
 <template>
-  <div class="viewer-container">
+  <div class="data-view-container">
     <!-- 未加载数据时的上传区域 -->
     <div v-if="!hasData" class="upload-area">
-      <el-upload
-        drag
-        action="#"
-        :auto-upload="false"
-        :on-change="handleFileChange"
-        :show-file-list="false"
-        accept=".csv,.parquet,.xlsx,.xls"
-      >
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <template #tip>
-          <div class="el-upload__tip">
-            支持 CSV / Parquet / Excel (xlsx, xls) <br />
-            自动识别编码与结构
+      <div class="upload-card">
+        <el-upload
+          drag
+          action="#"
+          :auto-upload="false"
+          :on-change="handleFileChange"
+          :show-file-list="false"
+          accept=".csv,.parquet,.xlsx,.xls"
+        >
+          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <div class="el-upload__text">
+            将数据资产拖到此处，或<em>点击上传</em>
           </div>
-        </template>
-      </el-upload>
+          <template #tip>
+            <div class="el-upload__tip">
+              支持 CSV / Parquet / Excel (xlsx, xls) <br />
+              智能识别编码与数据结构
+            </div>
+          </template>
+        </el-upload>
+      </div>
     </div>
 
     <!-- 加载数据后的网格展示区域 -->
     <div v-else class="grid-area">
-      <div class="toolbar">
+      <div class="data-header">
         <div class="left">
-          <el-button type="primary" plain @click="resetData"
-            >清除数据 / 重新上传</el-button
-          >
-        </div>
-        <div class="right">
-          <div class="table-info">
-            <el-tag v-if="detectedEncoding" type="warning" effect="plain"
-              >识别编码: {{ detectedEncoding.toUpperCase() }}</el-tag
+          <h2 class="table-title">{{ tableName }}</h2>
+          <div class="stats">
+            <el-tag size="small" type="info" effect="plain"
+              >Rows: {{ rowData.length.toLocaleString() }}</el-tag
             >
-            <el-tag type="info">表名: {{ tableName }}</el-tag>
-            <el-tag type="success">行数: {{ rowData.length }}</el-tag>
+            <el-tag
+              v-if="detectedEncoding"
+              size="small"
+              type="warning"
+              effect="plain"
+              >Encoding: {{ detectedEncoding.toUpperCase() }}</el-tag
+            >
           </div>
         </div>
+        <div class="right">
+          <el-button-group>
+            <el-button type="primary" @click="resetData">
+              <el-icon><Refresh /></el-icon>重新上传
+            </el-button>
+          </el-button-group>
+        </div>
       </div>
+
       <div class="grid-wrapper">
         <ag-grid-vue
           class="ag-theme-quartz"
@@ -57,12 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { UploadFilled } from "@element-plus/icons-vue";
+import { UploadFilled, Refresh } from "@element-plus/icons-vue";
 import { AgGridVue } from "ag-grid-vue3";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { engine } from "@/core/engine";
 import { importer } from "@/core/importer";
-import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
+import { ref, computed } from "vue";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -85,8 +99,8 @@ const handleFileChange = async (file: any) => {
 
   const loading = ElLoading.service({
     lock: true,
-    text: "正在加载 DuckDB 并分析文件...",
-    background: "rgba(255, 255, 255, 0.7)",
+    text: "AI 正在分析并解析数据架构...",
+    background: "rgba(255, 255, 255, 0.8)",
   });
 
   try {
@@ -106,6 +120,7 @@ const handleFileChange = async (file: any) => {
       sortable: true,
       filter: true,
       resizable: true,
+      minWidth: 120,
     }));
 
     hasData.value = true;
@@ -137,9 +152,10 @@ const onGridReady = (params: any) => {
 </script>
 
 <style lang="scss" scoped>
-.viewer-container {
-  padding: 20px;
+.data-view-container {
+  padding: 24px;
   height: 100%;
+  background-color: var(--el-bg-color-page);
   display: flex;
   flex-direction: column;
 }
@@ -147,32 +163,35 @@ const onGridReady = (params: any) => {
 .upload-area {
   flex: 1;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  .upload-settings {
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    background: var(--el-fill-color-light);
-    border-radius: 8px;
+  .upload-card {
+    background: var(--el-bg-color);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--el-border-color-lighter);
+    transition: transform 0.3s ease;
 
-    .label {
-      font-size: 14px;
-      color: var(--el-text-color-primary);
-      font-weight: 500;
+    &:hover {
+      transform: translateY(-4px);
     }
   }
 
   :deep(.el-upload-dragger) {
-    width: 400px;
-    height: 240px;
+    width: 480px;
+    height: 280px;
+    border: 2px dashed var(--el-border-color-light);
+    border-radius: 12px;
+    background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    &:hover {
+      border-color: var(--el-color-primary);
+    }
   }
 }
 
@@ -181,27 +200,46 @@ const onGridReady = (params: any) => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: var(--el-bg-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
-.toolbar {
-  margin-bottom: 16px;
+.data-header {
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
 
-.table-info {
-  display: flex;
-  gap: 12px;
+  .left {
+    .table-title {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+    }
+  }
 }
 
 .grid-wrapper {
   flex: 1;
   width: 100%;
   height: 0;
-  border: 1px solid var(--el-border-color-light);
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
+  border: 1px solid var(--el-border-color-light);
+}
+
+:deep(.ag-theme-quartz) {
+  --ag-background-color: var(--el-bg-color);
+  --ag-header-background-color: var(--el-fill-color-light);
+  --ag-font-family: inherit;
 }
 </style>

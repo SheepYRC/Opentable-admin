@@ -3,9 +3,9 @@
     <div v-if="!collapse" class="logo-buttons">
       <el-button-group>
         <el-button
-          :type="activeTab === 'admin' ? 'primary' : ''"
+          :type="activeTab === 'management' ? 'primary' : ''"
           size="small"
-          @click="activeTab = 'admin'"
+          @click="activeTab = 'management'"
         >
           管理
         </el-button>
@@ -32,8 +32,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, computed } from "vue";
 import { Platform } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import { useViewStore } from "@/stores";
 
 defineProps({
   collapse: {
@@ -42,19 +43,16 @@ defineProps({
   },
 });
 
+import { useRouter } from "vue-router";
 const router = useRouter();
-const route = useRoute();
+const viewStore = useViewStore();
 
-const activeTab = computed<"admin" | "data" | "ai">({
-  get: () => {
-    if (route.path.includes("/data-viewer")) return "data";
-    if (route.path.includes("/dashboard") || route.path === "/") return "admin";
-    return "admin";
-  },
-  set: (val) => {
-    if (val === "admin") router.push("/dashboard");
-    if (val === "data") router.push("/data-viewer");
-    if (val === "ai") ElMessage.info("智能模式开发中...");
+const activeTab = computed({
+  get: () => viewStore.activeView,
+  set: (val: "management" | "data" | "ai") => {
+    viewStore.setView(val);
+    if (val === "management") router.push("/dashboard");
+    if (val === "data") router.push("/data-view");
   },
 });
 </script>

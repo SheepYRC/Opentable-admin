@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useAIPanelStore } from "@/stores";
 import { ElMessage } from "element-plus";
 
