@@ -7,6 +7,9 @@ export interface ImportOptions {
   tableName?: string;
   encoding?: string; // 如果不传，则自动检测
   sheetIndex?: number; // 针对 Excel，指定导入第几个工作表
+  skipRows?: number;
+  skipCols?: number;
+  hasHeader?: boolean;
 }
 
 class DataImporter {
@@ -46,14 +49,13 @@ class DataImporter {
    * 导入文件到 DuckDB
    */
   async importFile(file: File, options: ImportOptions = {}) {
-    const tableName =
-      options.tableName || "t_" + Math.random().toString(36).substring(7);
+    const tableName = options.tableName || "t_" + Math.random().toString(36).substring(7);
     const extension = file.name.split(".").pop()?.toLowerCase();
 
     let usedEncoding = "";
 
     if (extension === "csv") {
-      const res = await this.importCSV(file, tableName, options.encoding);
+      const res = await this.importCSV(file, tableName, options);
       usedEncoding = res.encoding;
     } else if (extension === "parquet") {
       await this.importParquet(file, tableName);
@@ -71,9 +73,9 @@ class DataImporter {
   /**
    * 导入 CSV
    */
-  private async importCSV(file: File, tableName: string, encoding?: string) {
+  private async importCSV(file: File, tableName: string, options: ImportOptions = {}) {
     const db = (await engine.init())!;
-    const targetEncoding = encoding || (await this.detectEncoding(file));
+    const targetEncoding = options.encoding || (await this.detectEncoding(file));
 
     let buffer: Uint8Array;
     const originalBuffer = await file.arrayBuffer();
@@ -94,9 +96,33 @@ class DataImporter {
     }
 
     await db.registerFileBuffer(file.name, buffer);
-    await engine.query(
-      `CREATE OR REPLACE TABLE ${tableName} AS SELECT * FROM read_csv_auto('${file.name}')`
-    );
+
+    const skip = options.skipRows || 0;
+    const header = options.hasHeader !== undefined ? options.hasHeader : true;
+    const skipCols = options.skipCols || 0;
+
+    // 1. 先获取原始文件分析出的所有列名
+    // 使用 read_csv_auto 分析出的列头信息
+    const describeQuery = `DESCRIBE SELECT * FROM read_csv_auto('${file.name}', skip=${skip}, header=${header})`;
+    const describeResult = await engine.query(describeQuery);
+    const allColumns = describeResult.toArray().map((r) => r.toJSON().column_name);
+
+    // 2. 根据 skipCols 对列进行切片
+    const selectedColumns = allColumns.slice(skipCols);
+    
+    if (selectedColumns.length === 0) {
+      throw new Error("跳过列数过多，未检测到有效列");
+    }
+
+    // 3. 构造最终的创建表语句
+    // 将列名用双引号包裹以防特殊字符
+    const columnSelection = selectedColumns.map(name => `"${name}"`).join(", ");
+    
+    const query = `CREATE OR REPLACE TABLE ${tableName} AS 
+                   SELECT ${columnSelection} 
+                   FROM read_csv_auto('${file.name}', skip=${skip}, header=${header})`;
+
+    await engine.query(query);
 
     return { encoding: targetEncoding };
   }

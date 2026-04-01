@@ -22,7 +22,6 @@
       <div class="fixed-header">
         <LayoutNavbar />
         <LayoutTagsView v-if="showTagsView" />
-        <FunctionalBar />
       </div>
       <LayoutMain />
     </div>
@@ -38,7 +37,6 @@ import LayoutTagsView from "./components/LayoutTagsView.vue";
 import LayoutMain from "./components/LayoutMain.vue";
 import LayoutSidebar from "./components/LayoutSidebar.vue";
 import SidebarBottom from "./components/SidebarBottom.vue";
-import FunctionalBar from "./components/FunctionalBar.vue";
 
 const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
 </script>

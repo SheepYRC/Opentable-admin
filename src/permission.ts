@@ -2,6 +2,7 @@ import router from "@/router";
 import { AuthStorage } from "@/utils/auth";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import { useViewStore } from "@/stores";
 
 // NProgress 配置
 NProgress.configure({ showSpinner: false });
@@ -11,6 +12,12 @@ const whiteList = ["/login", "/auth-redirect"];
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
+
+  // 同步视图模式
+  const viewStore = useViewStore();
+  if (to.meta?.view) {
+    viewStore.setView(to.meta.view as any);
+  }
 
   const hasToken = AuthStorage.getAccessToken();
 

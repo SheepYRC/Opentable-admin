@@ -1,28 +1,63 @@
 import { defineStore } from "pinia";
 import type { RouteLocationNormalized } from "vue-router";
 import router from "@/router";
+import { useViewStore } from "./view";
+import { ref, watch, computed } from "vue";
+
+type ViewMode = "management" | "data" | "ai";
 
 export const useTagsViewStore = defineStore("tagsView", () => {
-  // 从 localStorage 加载持久化的视图 (除了 affix 类型的)
-  const savedViews = localStorage.getItem("visitedViews");
-  const initialViews = savedViews ? JSON.parse(savedViews) : [];
-  
-  const visitedViews = ref<RouteLocationNormalized[]>(initialViews);
-  const cachedViews = ref<string[]>([]);
+  const viewStore = useViewStore();
 
-  // 监听变化并同步到 localStorage (过滤掉无法序列化的部分)
-  watch(visitedViews, (val) => {
-    const persistViews = val.map((v: any) => ({
-      path: v.path,
-      fullPath: v.fullPath,
-      name: v.name,
-      meta: v.meta,
-      title: v.title,
-      query: v.query,
-      params: v.params
-    }));
-    localStorage.setItem("visitedViews", JSON.stringify(persistViews));
-  }, { deep: true });
+  // 从 localStorage 加载持久化的视图 (分视图模式存储)
+  const savedViews = localStorage.getItem("visitedViewsMap");
+  const initialViewsMap: Record<ViewMode, RouteLocationNormalized[]> = savedViews
+    ? JSON.parse(savedViews)
+    : {
+        management: [],
+        data: [],
+        ai: [],
+      };
+
+  const visitedViewsMap = ref<Record<ViewMode, RouteLocationNormalized[]>>(initialViewsMap);
+  const cachedViewsMap = ref<Record<ViewMode, string[]>>({
+    management: [],
+    data: [],
+    ai: [],
+  });
+
+  // 暴露给外部的“当前”视图 (通过计算属性，始终对应当前激活的顶层视图)
+  const visitedViews = computed(() => {
+    const mode = viewStore.activeView as ViewMode;
+    return visitedViewsMap.value[mode] || [];
+  });
+
+  const cachedViews = computed(() => {
+    const mode = viewStore.activeView as ViewMode;
+    return cachedViewsMap.value[mode] || [];
+  });
+
+  // 监听变化并同步到 localStorage
+  watch(
+    visitedViewsMap,
+    (val) => {
+      const persistMap: Record<string, any[]> = {};
+      for (const key in val) {
+        const mode = key as ViewMode;
+        persistMap[mode] = val[mode].map((v: any) => ({
+          path: v.path,
+          fullPath: v.fullPath,
+          name: v.name,
+          meta: v.meta,
+          title: v.title,
+          query: v.query,
+          params: v.params,
+        }));
+      }
+      localStorage.setItem("visitedViewsMap", JSON.stringify(persistMap));
+    },
+    { deep: true }
+  );
 
   function isActive(view: RouteLocationNormalized) {
     return view.path === router.currentRoute.value.path;
@@ -34,6 +69,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   }
 
   function addVisitedView(view: any) {
+    // 检查是否已经在当前视图池里
     if (visitedViews.value.some((v) => v.path === view.path)) return;
 
     const newView = {
@@ -69,9 +105,10 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   }
 
   function delVisitedView(view: any) {
-    for (const [i, v] of visitedViews.value.entries()) {
+    const views = visitedViews.value;
+    for (const [i, v] of views.entries()) {
       if (v.path === view.path) {
-        visitedViews.value.splice(i, 1);
+        views.splice(i, 1);
         break;
       }
     }
@@ -87,15 +124,19 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delOtherViews(view: any) {
     return new Promise((resolve) => {
-      visitedViews.value = visitedViews.value.filter((v) => {
+      const mode = viewStore.activeView as ViewMode;
+      const currentViews = visitedViewsMap.value[mode] || [];
+      visitedViewsMap.value[mode] = currentViews.filter((v) => {
         return v.meta?.affix || v.path === view.path;
       });
+      
+      const currentCaches = cachedViewsMap.value[mode] || [];
       const viewName = view.name as string;
-      const index = cachedViews.value.indexOf(viewName);
+      const index = currentCaches.indexOf(viewName);
       if (index > -1) {
-        cachedViews.value = cachedViews.value.slice(index, index + 1);
+        cachedViewsMap.value[mode] = currentCaches.slice(index, index + 1);
       } else {
-        cachedViews.value = [];
+        cachedViewsMap.value[mode] = [];
       }
       resolve({
         visitedViews: [...visitedViews.value],
@@ -106,9 +147,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delLeftViews(view: any) {
     return new Promise((resolve) => {
-      const index = visitedViews.value.findIndex((v) => v.path === view.path);
+      const mode = viewStore.activeView as ViewMode;
+      const views = visitedViewsMap.value[mode] || [];
+      const index = views.findIndex((v) => v.path === view.path);
       if (index === -1) return;
-      visitedViews.value = visitedViews.value.filter((v, i) => {
+      visitedViewsMap.value[mode] = views.filter((v, i) => {
         return v.meta?.affix || i >= index;
       });
       resolve({
@@ -119,9 +162,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delRightViews(view: any) {
     return new Promise((resolve) => {
-      const index = visitedViews.value.findIndex((v) => v.path === view.path);
+      const mode = viewStore.activeView as ViewMode;
+      const views = visitedViewsMap.value[mode] || [];
+      const index = views.findIndex((v) => v.path === view.path);
       if (index === -1) return;
-      visitedViews.value = visitedViews.value.filter((v, i) => {
+      visitedViewsMap.value[mode] = views.filter((v, i) => {
         return v.meta?.affix || i <= index;
       });
       resolve({
@@ -132,9 +177,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delAllViews() {
     return new Promise((resolve) => {
-      const affixTags = visitedViews.value.filter((tag) => tag.meta?.affix);
-      visitedViews.value = affixTags;
-      cachedViews.value = [];
+      const mode = viewStore.activeView as ViewMode;
+      const currentViews = visitedViewsMap.value[mode] || [];
+      const affixTags = currentViews.filter((tag) => tag.meta?.affix);
+      visitedViewsMap.value[mode] = affixTags;
+      cachedViewsMap.value[mode] = [];
       resolve({
         visitedViews: [...visitedViews.value],
         cachedViews: [...cachedViews.value],
@@ -150,7 +197,11 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       if (view && view.name === "Dashboard") {
         router.replace({ path: "/redirect" + view.fullPath });
       } else {
-        router.push("/");
+        // 如果没有标签了，跳转到当前模式的首页
+        const mode = viewStore.activeView;
+        if (mode === "data") router.push("/data-view");
+        else if (mode === "ai") router.push("/ai-chat");
+        else router.push("/");
       }
     }
   }
@@ -167,6 +218,8 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   return {
     visitedViews,
     cachedViews,
+    visitedViewsMap,
+    cachedViewsMap,
     isActive,
     addView,
     addVisitedView,

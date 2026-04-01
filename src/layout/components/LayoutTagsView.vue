@@ -69,7 +69,7 @@
 import { useRoute, useRouter, type RouteRecordRaw } from "vue-router";
 import { resolve } from "path-browserify";
 import { translateRouteTitle } from "@/lang/utils";
-import { usePermissionStore, useTagsViewStore } from "@/stores";
+import { usePermissionStore, useTagsViewStore, useViewStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import { Refresh, Close, CircleClose, Back, Right, Minus } from "@element-plus/icons-vue";
 
@@ -85,6 +85,7 @@ const route = useRoute();
 // 状态管理
 const permissionStore = usePermissionStore();
 const tagsViewStore = useTagsViewStore();
+const viewStore = useViewStore();
 
 const { visitedViews } = storeToRefs(tagsViewStore);
 
@@ -106,6 +107,8 @@ const isFirstView = computed(() => {
   if (!selectedTag.value) return false;
   return (
     selectedTag.value.path === "/dashboard" ||
+    selectedTag.value.path === "/data-view" ||
+    selectedTag.value.path === "/ai-chat" ||
     selectedTag.value.fullPath === visitedViews.value[0]?.fullPath
   );
 });
@@ -149,6 +152,7 @@ const extractAffixTags = (routes: readonly RouteRecordRaw[], basePath = "/"): an
  * 初始化固定标签
  */
 const initAffixTags = () => {
+  // 注意：这里的 permissionStore.routes 已经是过滤后的了
   const affixTags = extractAffixTags(permissionStore.routes);
   affixTags.forEach((tag) => {
     if (tag.name) {
@@ -277,6 +281,15 @@ watch(
     addCurrentTag();
   },
   { immediate: false }
+);
+
+// 监听视图模式切换
+watch(
+  () => viewStore.activeView,
+  () => {
+    initAffixTags();
+    addCurrentTag();
+  }
 );
 
 onMounted(() => {

@@ -1,9 +1,10 @@
 
-
-
 ---
 1.首页可以放vue-grid-layout，让用户自由划定区域，配置要展示什么，完全自定义的首页信息
 2.顶部栏放全局搜索和ai输入栏，用于调用page-agent直接进行操作
 3.数据持久化，indexeddb还是其他
 
 4.设计意图驱动工程模块，然后可以集成slidev，实现意图转html转markdown转html转ppt/pdf
+
+
+

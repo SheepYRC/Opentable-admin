@@ -1,9 +1,5 @@
 <template>
   <div class="navbar">
-    <div class="navbar__left">
-      <Hamburger :is-active="isSidebarOpened" @toggle-click="toggleSideBar" />
-    </div>
-    
     <LayoutSearch />
 
     <div class="navbar__actions">
@@ -13,18 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useAppStore } from "@/stores";
-import Hamburger from "@/components/Hamburger/index.vue";
 import LayoutSearch from "./LayoutSearch.vue";
-
-const appStore = useAppStore();
-
-const isSidebarOpened = computed(() => appStore.sidebar.opened);
-
-function toggleSideBar() {
-  appStore.toggleSidebar();
-}
 </script>
 
 <style lang="scss" scoped>
