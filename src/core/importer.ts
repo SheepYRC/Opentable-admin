@@ -61,7 +61,7 @@ class DataImporter {
       await this.importParquet(file, tableName);
       usedEncoding = "parquet";
     } else if (extension === "xlsx" || extension === "xls") {
-      await this.importExcel(file, tableName, options.sheetIndex ?? 0);
+      await this.importExcel(file, tableName, options);
       usedEncoding = "excel";
     } else {
       throw new Error(`不支持的文件格式: .${extension}`);
@@ -143,7 +143,12 @@ class DataImporter {
    * 导入 Excel (.xlsx, .xls)
    * 使用 SheetJS 将数据转为 JSON 后由 DuckDB 摄入
    */
-  private async importExcel(file: File, tableName: string, sheetIndex: number) {
+  private async importExcel(file: File, tableName: string, options: ImportOptions = {}) {
+    const sheetIndex = options.sheetIndex ?? 0;
+    const skipRows = options.skipRows ?? 0;
+    const skipCols = options.skipCols ?? 0;
+    const hasHeader = options.hasHeader !== undefined ? options.hasHeader : true;
+
     const db = (await engine.init())!;
     const data = await file.arrayBuffer();
     const workbook = XLSX.read(data, { type: "array" });
@@ -161,11 +166,41 @@ class DataImporter {
       throw new Error("无法读取工作表内容");
     }
 
-    // 将 Sheet 转为 JSON
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    // 将 Sheet 转为 2D 数组进行手动处理 skipRows/skipCols
+    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, range: skipRows }) as any[][];
 
-    if (jsonData.length === 0) {
+    if (rawData.length === 0) {
       throw new Error("Excel 文件中没有数据");
+    }
+
+    // 处理 skipCols 并转为 JSON 对象数组
+    let jsonData: any[] = [];
+    if (hasHeader) {
+      const headers = (rawData[0] || []).slice(skipCols);
+      const dataRows = rawData.slice(1);
+      
+      jsonData = dataRows.map(row => {
+        const obj: any = {};
+        const slicedRow = (row || []).slice(skipCols);
+        headers.forEach((h: any, i: number) => {
+          const key = (h !== undefined && h !== null && h !== "") ? String(h) : `column${i}`;
+          obj[key] = slicedRow[i];
+        });
+        return obj;
+      });
+    } else {
+      jsonData = rawData.map(row => {
+        const obj: any = {};
+        const slicedRow = (row || []).slice(skipCols);
+        slicedRow.forEach((v: any, i: number) => {
+          obj[`column${i}`] = v;
+        });
+        return obj;
+      });
+    }
+
+    if (jsonData.length === 0 && !hasHeader) {
+      throw new Error("Excel 文件处理后没有数据");
     }
 
     // 采用 insertJSON 的方式注入，这需要使用 connection

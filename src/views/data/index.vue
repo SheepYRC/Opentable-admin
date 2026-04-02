@@ -42,7 +42,7 @@
               </div>
             </div>
             <div class="file-actions">
-              <el-button type="primary" size="small">导入</el-button>
+              <el-button type="primary" size="small" @click="handleImport">导入</el-button>
               <el-button link type="danger" size="small" @click="resetUpload">关闭</el-button>
             </div>
           </div>
@@ -106,10 +106,13 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { engine } from "@/core/engine";
 import { importer } from "@/core/importer";
 import { ElMessage } from "element-plus";
+import { useTableStore } from "@/stores";
 import { useDebounceFn } from "@vueuse/core";
 
 // 注册 AG-Grid 模块
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+const tableStore = useTableStore();
 
 // --- 状态定义 ---
 const uploadStatus = ref<"idle" | "uploading" | "ready">("idle");
@@ -179,6 +182,7 @@ const processFile = async (isInitial = false) => {
 
   try {
     const result = await importer.importFile(fileInfo.raw, {
+      tableName: tableName.value || undefined,
       skipRows: importConfigs.skipRows,
       skipCols: importConfigs.skipCols,
       hasHeader: importConfigs.firstRowTitle,
@@ -207,6 +211,34 @@ const processFile = async (isInitial = false) => {
     if (isInitial) uploadStatus.value = "idle";
   } finally {
     isPreviewLoading.value = false;
+  }
+};
+
+const handleImport = async () => {
+  if (!tableName.value) {
+    ElMessage.warning("请先解析文件");
+    return;
+  }
+
+  try {
+    tableStore.addTable({
+      tableName: tableName.value,
+      originalName: fileInfo.name,
+      rowCount: rowData.value.length,
+      importTime: Date.now(),
+    });
+
+    ElMessage.success(`数据表 [${fileInfo.name}] 导入成功`);
+
+    // 预留持久化调用点
+    await tableStore.persistToDisk();
+
+    // 延迟重置，给用户一点反馈时间
+    setTimeout(() => {
+      resetUpload();
+    }, 800);
+  } catch (error: any) {
+    ElMessage.error("导入失败: " + error.message);
   }
 };
 

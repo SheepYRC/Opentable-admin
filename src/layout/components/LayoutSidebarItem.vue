@@ -18,9 +18,26 @@
             <component :is="onlyOneChild.meta.icon || item.meta?.icon" />
           </el-icon>
           <template #title>
-            <span v-if="onlyOneChild.meta.title">
-              {{ translateRouteTitle(onlyOneChild.meta.title as string) }}
-            </span>
+            <div class="menu-title-container">
+              <span v-if="onlyOneChild && onlyOneChild.meta && onlyOneChild.meta.title">
+                {{ translateRouteTitle(onlyOneChild.meta.title as string) }}
+              </span>
+              <!-- 仅针对数据表显示更多操作 -->
+              <div v-if="onlyOneChild && onlyOneChild.meta && onlyOneChild.meta.isTable" class="item-actions" @click.stop.prevent>
+                <el-dropdown trigger="click" @command="handleCommand($event, onlyOneChild)">
+                  <span class="more-icon-btn" @click.stop.prevent @mousedown.stop @mouseup.stop>
+                    <el-icon><MoreFilled /></el-icon>
+                  </span>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="delete">
+                        <el-icon><Delete /></el-icon> 删除
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
           </template>
         </el-menu-item>
       </AppLink>
@@ -54,6 +71,9 @@ import path from "path-browserify";
 import type { RouteRecordRaw } from "vue-router";
 import { isExternal } from "@/utils/validate";
 import { translateRouteTitle } from "@/lang/utils";
+import { MoreFilled, Delete } from "@element-plus/icons-vue";
+import { useTableStore } from "@/stores";
+import { ElMessageBox, ElMessage } from "element-plus";
 import AppLink from "./AppLink.vue";
 
 const props = defineProps({
@@ -71,7 +91,25 @@ const props = defineProps({
   },
 });
 
+const tableStore = useTableStore();
 const onlyOneChild = ref<any>(null);
+
+const handleCommand = (command: string, item: any) => {
+  if (command === "delete") {
+    // 优先从 meta 中获取表名，以前从路径中提取的方法不够严谨且不稳定
+    const tableName = item.meta?.tableName;
+    if (!tableName) return;
+
+    ElMessageBox.confirm(`确定要删除数据表 [${item.meta.title}] 吗？`, "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    }).then(async () => {
+      await tableStore.removeTable(tableName);
+      ElMessage.success("删除成功");
+    });
+  }
+};
 
 function hasOneShowingChild(children: RouteRecordRaw[] = [], parent: RouteRecordRaw) {
   const showingChildren = children.filter((route: RouteRecordRaw) => {
@@ -110,6 +148,58 @@ function resolvePath(routePath: string) {
 .el-menu-item {
   &.is-active {
     background-color: var(--el-color-primary-light-9);
+  }
+}
+
+.menu-title-container {
+  position: relative; // 为绝对定位提供基准
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+
+  span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 24px; // 为操作按钮预留空间
+  }
+
+  .item-actions {
+    position: absolute;
+    right: 0;
+    display: none;
+    line-height: normal;
+    background-color: transparent;
+    z-index: 10;
+    
+    .more-icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: var(--el-fill-color);
+      }
+    }
+  }
+}
+
+.el-menu-item:hover {
+  .item-actions {
+    display: flex;
+  }
+}
+
+// 当侧边栏折叠时隐藏操作按钮
+.el-menu--collapse {
+  .item-actions {
+    display: none !important;
   }
 }
 </style>

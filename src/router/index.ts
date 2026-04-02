@@ -38,8 +38,9 @@ export const constantRoutes: RouteRecordRaw[] = [
       },
       {
         path: "data-viewer",
-        redirect: "data-view",
-        meta: { hidden: true },
+        component: () => import("@/views/data/viewer.vue"),
+        name: "DataViewer",
+        meta: { title: "数据预览", hidden: true, view: "data" },
       },
       {
         path: "ai-chat",
