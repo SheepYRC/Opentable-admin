@@ -3,9 +3,7 @@
     <router-view>
       <template #default="{ Component, route }">
         <transition :name="transitionName" mode="out-in">
-          <keep-alive :include="cachedViews">
-            <component :is="currentComponent(Component, route)" :key="route.fullPath" />
-          </keep-alive>
+          <component :is="currentComponent(Component, route)" :key="route.fullPath" />
         </transition>
       </template>
     </router-view>
@@ -19,11 +17,9 @@
 
 <script setup lang="ts">
 import { type RouteLocationNormalized } from "vue-router";
-import { useSettingsStore, useTagsViewStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import variables from "@/styles/variables.module.scss";
 import Error404 from "@/views/error/404.vue";
-
-const { cachedViews } = toRefs(useTagsViewStore());
 
 const settingsStore = useSettingsStore();
 
@@ -62,11 +58,7 @@ const currentComponent = (component: Component, route: RouteLocationNormalized) 
 };
 
 const appMainHeight = computed(() => {
-  if (settingsStore.showTagsView) {
-    return `calc(100vh - ${variables["navbar-height"]} - ${variables["tags-view-height"]})`;
-  } else {
-    return `calc(100vh - ${variables["navbar-height"]})`;
-  }
+  return `calc(100vh - ${variables["navbar-height"]})`;
 });
 
 // 页面切换动画名称

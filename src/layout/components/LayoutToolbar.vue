@@ -20,17 +20,12 @@
         </template>
       </el-dropdown>
     </div>
-
-    <!-- 全局AI面板 -->
-    <div class="navbar-actions__item" @click="handleAIClick">
-      <el-icon :size="18"><Reading /></el-icon>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { FullScreen, Reading } from "@element-plus/icons-vue";
-import { useSettingsStore, useUserStore, useAIPanelStore } from "@/stores";
+import { FullScreen } from "@element-plus/icons-vue";
+import { useSettingsStore, useUserStore } from "@/stores";
 import { useFullscreen } from "@vueuse/core";
 import { ElMessageBox } from "element-plus";
 import logo from "@/assets/logo.svg";
@@ -54,12 +49,6 @@ function handleLogout() {
   }).then(() => {
     userStore.logout();
   });
-}
-
-const AIPanelStore = useAIPanelStore();
-
-function handleAIClick() {
-  AIPanelStore.AIPanelVisible = true;
 }
 </script>
 

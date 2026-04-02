@@ -15,13 +15,11 @@
     <div
       class="layout__main"
       :class="{
-        hasTagsView: showTagsView,
         'layout__main--collapsed': !isSidebarOpen,
       }"
     >
       <div class="fixed-header">
         <LayoutNavbar />
-        <LayoutTagsView v-if="showTagsView" />
       </div>
       <LayoutMain />
     </div>
@@ -33,12 +31,11 @@ import { useLayout } from "./useLayout";
 import BaseLayout from "./BaseLayout.vue";
 import LayoutLogo from "./components/LayoutLogo.vue";
 import LayoutNavbar from "./components/LayoutNavbar.vue";
-import LayoutTagsView from "./components/LayoutTagsView.vue";
 import LayoutMain from "./components/LayoutMain.vue";
 import LayoutSidebar from "./components/LayoutSidebar.vue";
 import SidebarBottom from "./components/SidebarBottom.vue";
 
-const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
+const { showLogo, isSidebarOpen, routes } = useLayout();
 </script>
 
 <style lang="scss" scoped>
@@ -120,9 +117,4 @@ const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
   }
 }
 
-.hasTagsView {
-  :deep(.app-main) {
-    min-height: calc(100vh - $navbar-height - $tags-view-height) !important;
-  }
-}
 </style>

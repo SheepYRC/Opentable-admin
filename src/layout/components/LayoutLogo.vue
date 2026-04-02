@@ -51,8 +51,9 @@ const activeTab = computed({
   get: () => viewStore.activeView,
   set: (val: "management" | "data" | "ai") => {
     viewStore.setView(val);
-    if (val === "management") router.push("/dashboard");
-    if (val === "data") router.push("/data-view");
+    if (val === "management") router.push("/management/dashboard");
+    if (val === "data") router.push("/data/overview");
+    if (val === "ai") router.push("/ai/overview");
   },
 });
 </script>

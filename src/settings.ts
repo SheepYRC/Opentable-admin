@@ -30,7 +30,6 @@ export const defaults = {
   layout: LayoutMode.LEFT,
   size: ComponentSize.DEFAULT,
   language: LanguageEnum.ZH_CN,
-  showTagsView: true,
   showAppLogo: true,
   showWatermark: false,
   pageSwitchingAnimation: "fade-slide",

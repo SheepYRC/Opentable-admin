@@ -57,10 +57,7 @@
           <transition name="slide-right">
             <div v-if="isSqlEditorOpen" class="grid-block sql-editor-panel">
               <div class="panel-header">
-                <span class="panel-title">SQL 查询分析</span>
-                <el-button link @click="isSqlEditorOpen = false">
-                  <el-icon><Close /></el-icon>
-                </el-button>
+                <span class="panel-title">SQL</span>
               </div>
               <div class="panel-content">
                 <el-empty description="SQL 编辑器功能开发中..." :image-size="80">

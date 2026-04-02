@@ -15,7 +15,6 @@ export const useSettingsStore = defineStore("settings", () => {
   const size = useStorage<ComponentSize>("size", defaults.size);
   const language = useStorage<LanguageEnum>("language", defaults.language);
 
-  const showTagsView = useStorage<boolean>("showTagsView", defaults.showTagsView);
   const showAppLogo = useStorage<boolean>("showAppLogo", defaults.showAppLogo);
   const showWatermark = useStorage<boolean>("showWatermark", defaults.showWatermark);
   const showSettings = useStorage<boolean>("showSettings", defaults.showSettings);
@@ -52,7 +51,6 @@ export const useSettingsStore = defineStore("settings", () => {
     layout.value = defaults.layout;
     size.value = defaults.size;
     language.value = defaults.language;
-    showTagsView.value = defaults.showTagsView;
     showAppLogo.value = defaults.showAppLogo;
     showWatermark.value = defaults.showWatermark;
     showSettings.value = defaults.showSettings;
@@ -67,7 +65,6 @@ export const useSettingsStore = defineStore("settings", () => {
     layout,
     size,
     language,
-    showTagsView,
     showAppLogo,
     showWatermark,
     showSettings,

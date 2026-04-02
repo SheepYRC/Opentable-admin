@@ -8,7 +8,6 @@ export interface AppSettings {
   title: string;
   version: string;
   showSettings: boolean;
-  showTagsView: boolean;
   showAppLogo: boolean;
   layout: "left" | "top" | "mix";
   themeColor: string;

@@ -43,7 +43,6 @@ export function useLayout() {
 
   const currentLayout = computed(() => settingsStore.layout);
   const isSidebarOpen = computed(() => appStore.sidebar.opened);
-  const showTagsView = computed(() => settingsStore.showTagsView);
   const showSettings = computed(() => settingsStore.showSettings);
   const showLogo = computed(() => settingsStore.showAppLogo);
 
@@ -87,7 +86,6 @@ export function useLayout() {
     currentLayout,
     layoutClass,
     isSidebarOpen,
-    showTagsView,
     showSettings,
     showLogo,
     // 菜单

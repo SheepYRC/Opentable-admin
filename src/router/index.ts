@@ -22,38 +22,88 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: "/",
     component: Layout,
-    redirect: "/dashboard",
+    redirect: "/management/dashboard",
     children: [
+      // --- 管理视图 (扁平结构) ---
       {
-        path: "dashboard",
+        path: "management/dashboard",
         component: () => import("@/views/dashboard/index.vue"),
-        name: "Dashboard",
-        meta: { title: "管理面板", icon: "HomeFilled", affix: true, view: "management" },
+        name: "ManagementDashboard",
+        meta: { title: "管理面板", icon: "HomeFilled", view: "management" },
       },
       {
-        path: "data-view",
-        component: () => import("@/views/data/index.vue"),
-        name: "DataView",
-        meta: { title: "资产管理", icon: "DataAnalysis", view: "data" },
+        path: "management/users",
+        component: () => import("@/views/management/users.vue"),
+        name: "ManagementUsers",
+        meta: { title: "用户管理", icon: "User", view: "management" },
       },
       {
-        path: "data-viewer",
-        component: () => import("@/views/data/viewer.vue"),
-        name: "DataViewer",
-        meta: { title: "数据预览", hidden: true, view: "data" },
+        path: "management/settings",
+        component: () => import("@/views/management/settings.vue"),
+        name: "ManagementSettings",
+        meta: { title: "系统设置", icon: "Setting", view: "management" },
       },
+
+      // --- 数据视图 (层级结构) ---
       {
-        path: "ai-chat",
-        component: () => import("@/views/dashboard/index.vue"), // 临时占位
-        name: "AIChat",
-        meta: { title: "智能助手", icon: "ChatDotRound", view: "ai" },
+        path: "data",
+        name: "Data",
+        redirect: "/data/overview",
+        meta: { title: "数据总览", icon: "DataAnalysis", view: "data", alwaysShow: true, hasAddButton: true, addButtonRoute: "/data/import" },
+        children: [
+          {
+            path: "overview",
+            component: () => import("@/views/data/overview.vue"),
+            name: "DataOverview",
+            meta: { 
+              title: "总览详情", 
+              icon: "TrendCharts", 
+              view: "data",
+              hidden: true // 隐藏，让父级代表总览
+            },
+          },
+          {
+            path: "import",
+            component: () => import("@/views/data/index.vue"),
+            name: "DataImport",
+            meta: { title: "导入数据", icon: "UploadFilled", view: "data", hidden: true },
+          },
+          {
+            path: "viewer",
+            component: () => import("@/views/data/viewer.vue"),
+            name: "DataViewer",
+            meta: { title: "数据预览", view: "data", hidden: true },
+          },
+        ],
+      },
+
+      // --- 智能视图 (层级结构) ---
+      {
+        path: "ai",
+        name: "AI",
+        redirect: "/ai/overview",
+        meta: { title: "智能总览", icon: "MagicStick", view: "ai", alwaysShow: true },
+        children: [
+          {
+            path: "overview",
+            component: () => import("@/views/ai/overview.vue"),
+            name: "AIOverview",
+            meta: { title: "对话总览", icon: "Monitor", view: "ai", hidden: true },
+          },
+          {
+            path: "chats",
+            component: () => import("@/views/ai/chat.vue"),
+            name: "AIChats",
+            meta: { title: "对话记录", icon: "ChatDotRound", view: "ai", hidden: true }, // 隐藏旧的固定菜单
+          },
+        ],
       },
     ],
   },
   // 捕获所有 404
   {
     path: "/:pathMatch(.*)*",
-    redirect: "/dashboard",
+    redirect: "/management/dashboard",
     meta: { hidden: true },
   },
 ];

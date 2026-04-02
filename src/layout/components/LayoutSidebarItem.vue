@@ -22,6 +22,12 @@
               <span v-if="onlyOneChild && onlyOneChild.meta && onlyOneChild.meta.title">
                 {{ translateRouteTitle(onlyOneChild.meta.title as string) }}
               </span>
+              
+              <!-- 新增按钮 (用于数据总览等) -->
+              <div v-if="onlyOneChild?.meta?.hasAddButton" class="item-extra-actions" @click.stop.prevent="handleAddClick(onlyOneChild)">
+                <el-icon class="add-icon-btn"><Plus /></el-icon>
+              </div>
+
               <!-- 仅针对数据表显示更多操作 -->
               <div v-if="onlyOneChild && onlyOneChild.meta && onlyOneChild.meta.isTable" class="item-actions" @click.stop.prevent>
                 <el-dropdown trigger="click" @command="handleCommand($event, onlyOneChild)">
@@ -46,12 +52,19 @@
     <!--【非叶子节点】含子菜单 -->
     <el-sub-menu v-else :index="resolvePath(item.path)">
       <template #title>
-        <el-icon v-if="item.meta && item.meta.icon">
-          <component :is="item.meta.icon" />
-        </el-icon>
-        <span v-if="item.meta && item.meta.title">
-          {{ translateRouteTitle(item.meta.title as string) }}
-        </span>
+        <div class="menu-title-container">
+          <el-icon v-if="item.meta && item.meta.icon">
+            <component :is="item.meta.icon" />
+          </el-icon>
+          <span v-if="item.meta && item.meta.title">
+            {{ translateRouteTitle(item.meta.title as string) }}
+          </span>
+          
+          <!-- 新增按钮 (用于层级结构下的父级) -->
+          <div v-if="item.meta?.hasAddButton" class="item-extra-actions" @click.stop.prevent="handleAddClick(item)">
+            <el-icon class="add-icon-btn"><Plus /></el-icon>
+          </div>
+        </div>
       </template>
 
       <LayoutSidebarItem
@@ -71,7 +84,8 @@ import path from "path-browserify";
 import type { RouteRecordRaw } from "vue-router";
 import { isExternal } from "@/utils/validate";
 import { translateRouteTitle } from "@/lang/utils";
-import { MoreFilled, Delete } from "@element-plus/icons-vue";
+import { useRouter } from "vue-router";
+import { Plus, MoreFilled, Delete } from "@element-plus/icons-vue";
 import { useTableStore } from "@/stores";
 import { ElMessageBox, ElMessage } from "element-plus";
 import AppLink from "./AppLink.vue";
@@ -92,7 +106,15 @@ const props = defineProps({
 });
 
 const tableStore = useTableStore();
+const router = useRouter();
 const onlyOneChild = ref<any>(null);
+
+const handleAddClick = (child: any) => {
+  const route = child?.meta?.addButtonRoute;
+  if (route) {
+    router.push(route);
+  }
+};
 
 const handleCommand = (command: string, item: any) => {
   if (command === "delete") {
@@ -152,7 +174,7 @@ function resolvePath(routePath: string) {
 }
 
 .menu-title-container {
-  position: relative; // 为绝对定位提供基准
+  position: relative;
   display: flex;
   align-items: center;
   width: 100%;
@@ -163,16 +185,40 @@ function resolvePath(routePath: string) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding-right: 24px; // 为操作按钮预留空间
+    padding-right: 48px;
+  }
+
+  .item-actions, .item-extra-actions {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    line-height: normal;
+    z-index: 10;
+  }
+
+  .item-extra-actions {
+    right: 24px;
+    
+    .add-icon-btn {
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--el-text-color-secondary);
+      border: 1px solid var(--el-border-color);
+      border-radius: 4px;
+      padding: 1px;
+      transition: all 0.2s;
+      
+      &:hover {
+        color: var(--el-color-primary);
+        border-color: var(--el-color-primary);
+        background-color: var(--el-color-primary-light-9);
+      }
+    }
   }
 
   .item-actions {
-    position: absolute;
-    right: 0;
     display: none;
-    line-height: normal;
-    background-color: transparent;
-    z-index: 10;
     
     .more-icon-btn {
       display: flex;

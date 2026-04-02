@@ -35,11 +35,6 @@
         </div>
 
         <div class="config-item flex-x-between">
-          <span class="text-xs">{{ t("显示标签页") }}</span>
-          <el-switch v-model="settingsStore.showTagsView" />
-        </div>
-
-        <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("显示 Logo") }}</span>
           <el-switch v-model="settingsStore.showAppLogo" />
         </div>
